@@ -14,24 +14,15 @@ return new class extends Migration
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
             $table->foreignId('chain_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('zone_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('zone_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('code')->unique()->nullable();
-            $table->string('address_line1')->nullable();
-            $table->string('address_line2')->nullable();
             $table->string('city')->nullable();
-            $table->string('state')->nullable();
-            $table->string('postal_code', 20)->nullable();
+            $table->text('address')->nullable();
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
-            $table->unsignedInteger('geofence_radius')->default(800);
-            $table->string('contact_name')->nullable();
-            $table->string('contact_phone')->nullable();
-            $table->string('contact_email')->nullable();
-            $table->text('notes')->nullable();
+            $table->unsignedInteger('geofence_radius')->default(50);
             $table->boolean('is_active')->default(true);
-            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }

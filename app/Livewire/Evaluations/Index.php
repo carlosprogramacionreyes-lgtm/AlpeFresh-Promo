@@ -88,7 +88,7 @@ class Index extends Component
                 'name' => $evaluation->store?->name,
                 'chain' => $evaluation->store?->chain?->name,
                 'zone' => $evaluation->store?->zone?->name,
-                'address' => $evaluation->store?->address_line1,
+                'address' => $evaluation->store?->address,
             ],
             'photos' => $evaluation->photos->map(function ($photo) {
                 return [
@@ -111,7 +111,8 @@ class Index extends Component
 
     public function render()
     {
-        $userId = Auth::id();
+        $user = Auth::user();
+        $userId = $user?->id;
         $baseQuery = Evaluation::query()
             ->with(['store.chain', 'store.zone'])
             ->where('user_id', $userId);
@@ -165,10 +166,13 @@ class Index extends Component
 
         $evaluations = $query->paginate($this->perPage);
 
-        $storeOptions = Store::query()
-            ->whereHas('assignments', fn ($assignment) => $assignment->where('user_id', $userId)->active())
-            ->orderBy('name')
-            ->get(['id', 'name']);
+        $storeQuery = Store::query()->orderBy('name');
+
+        if (! $user?->isAdmin() && ! $user?->isSupervisor()) {
+            $storeQuery->whereHas('assignments', fn ($assignment) => $assignment->where('user_id', $userId)->active());
+        }
+
+        $storeOptions = $storeQuery->get(['id', 'name']);
 
         return view('livewire.evaluations.index', [
             'evaluations' => $evaluations,

@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\UserRole;
+
 return [
     'brand' => [
         'name' => 'Alpe Fresh Promotoras',
@@ -15,20 +17,39 @@ return [
             'label' => 'Nueva Visita',
             'icon' => 'zap',
             'route' => 'evaluations.create',
+            'roles' => [
+                UserRole::Admin,
+                UserRole::Supervisor,
+                UserRole::Promotor,
+            ],
         ],
         [
             'label' => 'Mis Visitas',
             'icon' => 'file-text',
             'route' => 'evaluations.index',
+            'roles' => [
+                UserRole::Admin,
+                UserRole::Supervisor,
+                UserRole::Promotor,
+            ],
         ],
         [
             'label' => 'Reportes',
             'icon' => 'bar-chart-3',
             'route' => 'reports.dashboard',
+            'roles' => [
+                UserRole::Admin,
+                UserRole::Supervisor,
+                UserRole::Analista,
+            ],
         ],
         [
             'label' => 'Configuración',
             'icon' => 'settings',
+            'roles' => [
+                UserRole::Admin,
+                UserRole::Supervisor,
+            ],
             'children' => [
                 [
                     'label' => 'Usuarios',

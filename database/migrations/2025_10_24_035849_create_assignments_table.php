@@ -16,11 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('store_id')->constrained()->cascadeOnDelete();
             $table->foreignId('assigned_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('assigned_at')->nullable();
-            $table->timestamp('unassigned_at')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->string('status')->default('active');
-            $table->text('notes')->nullable();
+            $table->timestamp('assigned_at')->useCurrent();
             $table->timestamps();
 
             $table->unique(['user_id', 'store_id']);

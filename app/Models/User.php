@@ -129,7 +129,7 @@ class User extends Authenticatable
     public function stores(): BelongsToMany
     {
         return $this->belongsToMany(Store::class, 'assignments')
-            ->withPivot(['is_active', 'status', 'assigned_at', 'unassigned_at'])
+            ->withPivot(['assigned_at'])
             ->withTimestamps();
     }
 

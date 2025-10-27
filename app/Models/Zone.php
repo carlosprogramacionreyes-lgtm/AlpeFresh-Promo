@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Zone extends Model
@@ -17,6 +18,7 @@ class Zone extends Model
         'region',
         'description',
         'is_active',
+        'chain_id',
         'metadata',
     ];
 
@@ -28,5 +30,10 @@ class Zone extends Model
     public function stores(): HasMany
     {
         return $this->hasMany(Store::class);
+    }
+
+    public function chain(): BelongsTo
+    {
+        return $this->belongsTo(Chain::class);
     }
 }

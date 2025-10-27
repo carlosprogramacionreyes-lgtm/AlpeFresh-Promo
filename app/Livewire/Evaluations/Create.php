@@ -83,21 +83,37 @@ class Create extends Component
 
         $user = Auth::user();
 
-        $this->assignmentOptions = Assignment::query()
-            ->with(['store.chain'])
-            ->active()
-            ->where('user_id', $user->id)
-            ->orderByDesc('assigned_at')
-            ->get()
-            ->map(fn (Assignment $assignment) => [
-                'assignment_id' => $assignment->id,
-                'store_id' => $assignment->store_id,
-                'store_name' => $assignment->store->name,
-                'chain_name' => $assignment->store->chain->name ?? null,
-                'zone_name' => $assignment->store->zone?->name,
-                'store' => $assignment->store,
-            ])
-            ->toArray();
+        if ($user->isAdmin() || $user->isSupervisor()) {
+            $this->assignmentOptions = Store::query()
+                ->with(['chain', 'zone'])
+                ->orderBy('name')
+                ->get()
+                ->map(fn (Store $store) => [
+                    'assignment_id' => null,
+                    'store_id' => $store->id,
+                    'store_name' => $store->name,
+                    'chain_name' => $store->chain?->name,
+                    'zone_name' => $store->zone?->name,
+                    'store' => $store,
+                ])
+                ->toArray();
+        } else {
+            $this->assignmentOptions = Assignment::query()
+                ->with(['store.chain', 'store.zone'])
+                ->active()
+                ->where('user_id', $user->id)
+                ->orderByDesc('assigned_at')
+                ->get()
+                ->map(fn (Assignment $assignment) => [
+                    'assignment_id' => $assignment->id,
+                    'store_id' => $assignment->store_id,
+                    'store_name' => $assignment->store->name,
+                    'chain_name' => $assignment->store->chain->name ?? null,
+                    'zone_name' => $assignment->store->zone?->name,
+                    'store' => $assignment->store,
+                ])
+                ->toArray();
+        }
 
         $this->productOptions = Product::query()
             ->where('is_active', true)
@@ -222,10 +238,11 @@ class Create extends Component
 
         $this->geofenceDistance = round($distance, 2);
         $this->geofenceChecked = true;
-        $this->geofenceValid = $distance <= ($store->geofence_radius ?? 800);
+        $this->geofenceValid = $distance <= ($store->geofence_radius ?? 50);
 
         if (! $this->geofenceValid) {
-            $this->addError('geofence', "Te encuentras fuera del radio permitido ({$store->geofence_radius} m). Distancia: {$this->geofenceDistance} m.");
+            $allowedRadius = $store->geofence_radius ?? 50;
+            $this->addError('geofence', "Te encuentras fuera del radio permitido ({$allowedRadius} m). Distancia: {$this->geofenceDistance} m.");
         } else {
             $this->resetErrorBag('geofence');
         }

@@ -10,6 +10,16 @@
             {{ $message }}
         </div>
     @enderror
+    @error('authorization')
+        <div class="rounded-3xl border border-red-200/80 bg-red-50 px-6 py-4 text-sm font-medium text-red-700 shadow-sm dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-100">
+            {{ $message }}
+        </div>
+    @enderror
+    @error('delete')
+        <div class="rounded-3xl border border-red-200/80 bg-red-50 px-6 py-4 text-sm font-medium text-red-700 shadow-sm dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-100">
+            {{ $message }}
+        </div>
+    @enderror
 
     <div class="rounded-3xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
         <div>
@@ -156,16 +166,34 @@
                                         <i data-lucide="pencil" class="h-3.5 w-3.5"></i>
                                         Editar
                                     </button>
-                                    <button
-                                        type="button"
-                                        wire:click="toggleActivation({{ $user->id }})"
-                                        wire:loading.attr="disabled"
-                                        class="inline-flex items-center gap-1 rounded-xl border border-transparent px-3 py-1.5 text-xs font-medium text-white transition focus:outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-slate-900
-                                            {{ $user->is_active ? 'bg-red-500 hover:bg-red-400 focus:ring-red-200' : 'bg-emerald-600 hover:bg-emerald-500 focus:ring-emerald-200' }}"
-                                    >
-                                        <i data-lucide="{{ $user->is_active ? 'user-x' : 'user-check' }}" class="h-3.5 w-3.5"></i>
-                                        {{ $user->activo ? 'Desactivar' : 'Activar' }}
-                                    </button>
+                                    @can('delete-users')
+                                        @if (auth()->id() !== $user->id)
+                                        <button
+                                            type="button"
+                                            x-data="{}"
+                                            x-on:click.prevent="if (confirm('¿Eliminar este usuario? Esta acción es permanente.')) { $wire.delete({{ $user->id }}) }"
+                                            class="inline-flex items-center gap-1 rounded-xl border border-transparent px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-1 dark:focus:ring-red-400 dark:focus:ring-offset-slate-900"
+                                            style="background-color: #991b1b; color: #ffffff;"
+                                        >
+                                            <span class="inline-flex items-center gap-1">
+                                                <i data-lucide="trash-2" class="h-3.5 w-3.5"></i>
+                                                <span>Eliminar</span>
+                                            </span>
+                                        </button>
+                                        @endif
+                                    @endcan
+                                    @can('toggle-user-status')
+                                        <button
+                                            type="button"
+                                            wire:click="toggleActivation({{ $user->id }})"
+                                            wire:loading.attr="disabled"
+                                            class="inline-flex items-center gap-1 rounded-xl border border-transparent px-3 py-1.5 text-xs font-medium text-white transition focus:outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-slate-900
+                                                {{ $user->is_active ? 'bg-red-500 hover:bg-red-400 focus:ring-red-200' : 'bg-emerald-600 hover:bg-emerald-500 focus:ring-emerald-200' }}"
+                                        >
+                                            <i data-lucide="{{ $user->is_active ? 'user-x' : 'user-check' }}" class="h-3.5 w-3.5"></i>
+                                            {{ $user->activo ? 'Desactivar' : 'Activar' }}
+                                        </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

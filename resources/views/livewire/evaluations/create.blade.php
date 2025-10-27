@@ -397,7 +397,7 @@
                     <div class="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
                         <p class="font-semibold text-slate-700 dark:text-slate-100">{{ $selectedStore->name }}</p>
                         <p>{{ $selectedStore->chain?->name }}</p>
-                        <p>{{ $selectedStore->address_line1 }}</p>
+                        <p>{{ $selectedStore->address }}</p>
                         <p class="text-xs text-slate-400">Lat: {{ $selectedStore->latitude ?? 'N/D' }} · Lng: {{ $selectedStore->longitude ?? 'N/D' }}</p>
                         <p class="text-xs text-slate-400">Zona: {{ $selectedStore->zone?->name ?? 'N/D' }}</p>
                     </div>

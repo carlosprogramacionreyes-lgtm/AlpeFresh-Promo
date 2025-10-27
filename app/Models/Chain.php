@@ -32,4 +32,9 @@ class Chain extends Model
     {
         return $this->hasMany(Store::class);
     }
+
+    public function zones(): HasMany
+    {
+        return $this->hasMany(Zone::class);
+    }
 }

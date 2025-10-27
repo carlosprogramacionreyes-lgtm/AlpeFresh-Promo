@@ -36,6 +36,10 @@ class AuthServiceProvider extends ServiceProvider
                 || $user->isSupervisor();
         });
 
+        Gate::define('toggle-user-status', fn (User $user): bool => $user->isAdmin());
+
+        Gate::define('delete-users', fn (User $user): bool => $user->isAdmin());
+
         Gate::define('evaluate', function (User $user): bool {
             return $user->isAdmin()
                 || $user->isSupervisor()

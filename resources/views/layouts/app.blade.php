@@ -16,8 +16,8 @@
     </head>
     @php
         $navigation = config('navigation');
-        $menuItems = $navigation['items'] ?? [];
         $currentUser = auth()->user();
+        $menuItems = \App\Support\Navigation\MenuBuilder::forUser($currentUser);
     @endphp
     <body
         x-data="appLayout()"

@@ -57,6 +57,12 @@ class Users extends Component
 
         $user = User::findOrFail($userId);
 
+        if ($user->isAdmin() && ! auth()->user()?->isAdmin()) {
+            $this->addError('authorization', 'No tienes permiso para editar este usuario.');
+
+            return;
+        }
+
         $this->editingUserId = $user->id;
         $this->form = [
             'nombre_completo' => $user->nombre_completo,
@@ -86,7 +92,11 @@ class Users extends Component
 
     public function toggleActivation(int $userId): void
     {
-        $this->authorize('config-manage');
+        if (! auth()->user()?->can('toggle-user-status')) {
+            $this->addError('activation', 'No tienes permiso para cambiar el estado de este usuario.');
+
+            return;
+        }
 
         $user = User::findOrFail($userId);
 
@@ -103,9 +113,52 @@ class Users extends Component
         session()->flash('status', 'Estado de usuario actualizado.');
     }
 
+    public function delete(int $userId): void
+    {
+        $this->authorize('delete-users');
+
+        $user = User::findOrFail($userId);
+
+        if ($user->id === auth()->id()) {
+            $this->addError('delete', 'No puedes eliminar tu propia cuenta.');
+
+            return;
+        }
+
+        $user->delete();
+
+        Log::info('Livewire config.users user deleted', [
+            'deleted_user_id' => $userId,
+            'deleted_by' => auth()->id(),
+        ]);
+
+        if ($this->editingUserId === $userId) {
+            $this->resetForm();
+            $this->resetValidation();
+        }
+
+        $this->resetErrorBag('delete');
+
+        session()->flash('status', 'Usuario eliminado correctamente.');
+
+        $this->resetPage();
+    }
+
     public function save(): void
     {
         $this->authorize('config-manage');
+
+        $editing = null;
+
+        if ($this->editingUserId) {
+            $editing = User::findOrFail($this->editingUserId);
+
+            if ($editing->isAdmin() && ! auth()->user()?->isAdmin()) {
+                $this->addError('authorization', 'No tienes permiso para editar este usuario.');
+
+                return;
+            }
+        }
 
         Log::info('Livewire config.users save triggered', [
             'acting_user_id' => auth()->id(),
@@ -132,9 +185,8 @@ class Users extends Component
             $payload['password'] = $validated['form']['password'];
         }
 
-        if ($this->editingUserId) {
-            $user = User::findOrFail($this->editingUserId);
-            $user->update($payload);
+        if ($editing) {
+            $editing->update($payload);
 
             Log::info('Livewire config.users user updated', [
                 'editing_user_id' => $this->editingUserId,
@@ -204,7 +256,11 @@ class Users extends Component
         ];
 
         if ($this->editingUserId) {
-            $rules['form.password'] = ['nullable', 'string', 'min:8'];
+            $rules['form.password'] = ['nullable', 'string'];
+
+            if (filled($this->form['password'] ?? null)) {
+                $rules['form.password'][] = 'min:8';
+            }
         } else {
             $rules['form.password'] = ['required', 'string', 'min:8'];
         }

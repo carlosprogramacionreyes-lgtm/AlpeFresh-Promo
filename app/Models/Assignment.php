@@ -16,16 +16,10 @@ class Assignment extends Model
         'store_id',
         'assigned_by',
         'assigned_at',
-        'unassigned_at',
-        'is_active',
-        'status',
-        'notes',
     ];
 
     protected $casts = [
         'assigned_at' => 'datetime',
-        'unassigned_at' => 'datetime',
-        'is_active' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -50,6 +44,6 @@ class Assignment extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query;
     }
 }

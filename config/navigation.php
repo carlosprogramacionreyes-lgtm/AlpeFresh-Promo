@@ -78,7 +78,7 @@ return [
                 ],
                 [
                     'label' => 'Productos',
-                    'icon' => 'apple',
+                    'icon' => 'package',
                     'route' => 'config.products',
                 ],
                 [

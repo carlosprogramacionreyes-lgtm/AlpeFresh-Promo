@@ -118,11 +118,12 @@ class Create extends Component
         $this->productOptions = Product::query()
             ->where('is_active', true)
             ->orderBy('name')
-            ->get(['id', 'name', 'sku'])
+            ->get(['id', 'name', 'presentation', 'category'])
             ->map(fn (Product $product) => [
                 'id' => $product->id,
                 'name' => $product->name,
-                'sku' => $product->sku,
+                'presentation' => $product->presentation,
+                'category' => $product->category,
             ])
             ->toArray();
 
@@ -287,7 +288,8 @@ class Create extends Component
                 $availabilityData[] = [
                     'product_id' => $row['product_id'],
                     'product_name' => $product?->name,
-                    'sku' => $product?->sku,
+                    'category' => $product?->category,
+                    'presentation' => $product?->presentation,
                     'location' => $row['location'],
                     'status' => $row['status'],
                     'notes' => $row['notes'],

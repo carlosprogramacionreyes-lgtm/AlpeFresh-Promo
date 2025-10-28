@@ -160,7 +160,15 @@
                                         <select wire:model="availabilityRows.{{ $index }}.product_id" class="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
                                             <option value="">Selecciona</option>
                                             @foreach ($products as $product)
-                                                <option value="{{ $product['id'] }}">{{ $product['name'] }} @if($product['sku']) · {{ $product['sku'] }} @endif</option>
+                                                <option value="{{ $product['id'] }}">
+                                                    {{ $product['name'] }}
+                                                    @if($product['presentation'])
+                                                        · {{ $product['presentation'] }}
+                                                    @endif
+                                                    @if($product['category'])
+                                                        · {{ $product['category'] }}
+                                                    @endif
+                                                </option>
                                             @endforeach
                                         </select>
                                         @error('availabilityRows.' . $index . '.product_id')

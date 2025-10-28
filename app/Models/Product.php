@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
@@ -11,25 +13,23 @@ class Product extends Model
 
     protected $fillable = [
         'name',
-        'slug',
-        'sku',
-        'barcode',
-        'brand',
         'category',
-        'packaging',
-        'unit_size',
-        'min_price',
-        'max_price',
-        'description',
-        'photo_path',
+        'presentation',
+        'short_description',
         'is_active',
-        'metadata',
     ];
 
     protected $casts = [
-        'min_price' => 'float',
-        'max_price' => 'float',
-        'metadata' => 'array',
         'is_active' => 'boolean',
     ];
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('position');
+    }
+
+    public function mainImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)->orderBy('position');
+    }
 }

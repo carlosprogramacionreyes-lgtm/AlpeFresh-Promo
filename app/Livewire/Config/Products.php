@@ -39,7 +39,6 @@ class Products extends Component
      *     name:string,
      *     category:string|null,
      *     presentation:string|null,
-     *     short_description:string|null,
      *     is_active:bool
      * }
      */
@@ -81,7 +80,7 @@ class Products extends Component
         $this->resetPage();
     }
 
-    public function save(): void
+    public function saveProduct(): void
     {
         $validated = $this->validate($this->rules(), $this->validationMessages());
 
@@ -91,15 +90,12 @@ class Products extends Component
 $payload = [
     'name' => trim($validated['form']['name']),
     'slug' => Str::slug($validated['form']['name']), // 🔹 genera el slug automáticamente
+'sku' => strtoupper(Str::random(8)), // 🔹 genera SKU aleatorio tipo "A9D3G1H2"
     'category' => $this->nullableValue($validated['form']['category']),
     'presentation' => $this->nullableValue($validated['form']['presentation']),
-    'description' => $this->nullableValue($validated['form']['description'] ?? null),
+'description' => $this->nullableValue($validated['form']['description'] ?? null),
     'is_active' => $validated['form']['is_active'] ? 1 : 0,
 ];
-
-
-
-
         if ($this->editingId) {
             $product = Product::with('images')->findOrFail($this->editingId);
             $product->update($payload);
@@ -128,7 +124,8 @@ $payload = [
             'name' => $product->name,
             'category' => $product->category,
             'presentation' => $product->presentation,
-            
+'description' => $product->description,
+
             'is_active' => $product->is_active,
         ];
 
@@ -233,7 +230,7 @@ $payload = [
             'form.name' => ['required', 'string', 'max:255'],
             'form.category' => ['nullable', 'string', 'max:255'],
             'form.presentation' => ['nullable', 'string', 'max:255'],
-            'form.short_description' => ['nullable', 'string', 'max:1000'],
+'form.description' => ['nullable', 'string', 'max:1000'],
             'form.is_active' => ['required', 'boolean'],
             'uploads.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ];
@@ -249,7 +246,7 @@ $payload = [
             'form.name.max' => 'El nombre del producto no puede superar los 255 caracteres.',
             'form.category.max' => 'La categoría no puede superar los 255 caracteres.',
             'form.presentation.max' => 'La presentación no puede superar los 255 caracteres.',
-            'form.short_description.max' => 'La descripción breve no puede superar los 1000 caracteres.',
+
             'uploads.*.image' => 'Cada archivo debe ser una imagen válida.',
             'uploads.*.mimes' => 'Sólo se permiten imágenes en formato JPG, PNG o WEBP.',
             'uploads.*.max' => 'Cada imagen debe pesar menos de 5MB.',
@@ -329,7 +326,6 @@ $payload = [
             'name' => '',
             'category' => null,
             'presentation' => null,
-            'short_description' => null,
             'is_active' => true,
         ];
 

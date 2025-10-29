@@ -10,15 +10,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Product extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'category',
-        'presentation',
-        'short_description',
-        'is_active',
-    ];
-
+protected $fillable = [
+    'name',
+    'slug',
+'sku',
+    'category',
+    'presentation',
+    'description',
+    'is_active',
+];
     protected $casts = [
         'is_active' => 'boolean',
     ];

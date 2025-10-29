@@ -16,25 +16,13 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    @if ($editingId)
-
-<button
-    type="button"
-    wire:click="saveProduct"
-    class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
->
-    <i data-lucide="check-circle" class="h-4 w-4"></i>
-    Crear producto nuevo
-</button>
-
-                    @endif
                     <span class="inline-flex h-10 items-center rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-sky-500 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-400/40">
                         {{ $editingId ? 'Modo edición' : 'Alta rápida' }}
                     </span>
                 </div>
             </div>
 
-            <form wire:submit.prevent="save" class="mt-6 space-y-6">
+            <form wire:submit.prevent="saveProduct" class="mt-6 space-y-6">
                 <div class="grid gap-5 md:grid-cols-2">
                     <div class="space-y-2 md:col-span-2">
                         <label for="product-name" class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">
@@ -215,15 +203,16 @@
     type="submit"
     wire:click="saveProduct"
     wire:loading.attr="disabled"
-    wire:target="save,uploads"
-    class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:from-emerald-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
+    wire:target="saveProduct,uploads"
+
+class="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
+
 >
     <i data-lucide="{{ $editingId ? 'save' : 'sparkles' }}" class="h-4 w-4"></i>
     <span>
         {{ $editingId ? 'Guardar producto' : 'Crear producto nuevo' }}
     </span>
     <span wire:loading wire:target="saveProduct">Guardando...</span>
-</button>
 
 
                 </div>
@@ -314,7 +303,7 @@
             </div>
         </div>
 
-        <div class="relative mt-6 overflow-hidden">
+        <div class="relative mt-6 overflow-visible">
             <div wire:loading.flex wire:target="search,categoryFilter,statusFilter,delete,edit,save,uploads,removeExistingImage" class="absolute inset-0 z-10 hidden items-center justify-center bg-white/80 backdrop-blur dark:bg-slate-900/80">
                 <div class="flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-sm font-medium text-slate-500 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/80 dark:text-slate-300">
                     <span class="h-2.5 w-2.5 animate-ping rounded-full bg-emerald-500"></span>
@@ -356,7 +345,7 @@
                             </td>
                             <td class="px-4 py-4 align-middle">
                                 <div class="font-semibold text-slate-900 dark:text-slate-100">{{ $product->name }}</div>
-                                @if ($product->$product->description)
+                                @if ($product->short_description)
                                     <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">
                                         {{ Str::limit($product->short_description, 70) }}
                                     </p>
@@ -374,26 +363,31 @@
                                     {{ $product->is_active ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </td>
-                            <td class="rounded-r-3xl px-4 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <button
-                                        type="button"
-                                        wire:click="edit({{ $product->id }})"
-                                        class="inline-flex items-center gap-1 rounded-md bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm transition hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-200 dark:bg-slate-700/70 dark:text-slate-200 dark:hover:bg-slate-700"
-                                    >
-                                        <i data-lucide="pencil-line" class="h-3.5 w-3.5"></i>
-                                        Editar
-                                    </button>
-                                    <button
-                                        type="button"
-                                        wire:click="delete({{ $product->id }})"
-                                        x-data="{}"
-                                        x-on:click="if (! confirm('¿Eliminar el producto {{ addslashes($product->name) }}? Si tiene evaluaciones se marcará como inactivo.')) { $event.stopImmediatePropagation(); return false; }"
-                                        class="inline-flex items-center gap-1 rounded-md bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-200/70 dark:bg-rose-500 dark:hover:bg-rose-600"
-                                    >
-                                        <i data-lucide="trash-2" class="h-3.5 w-3.5"></i>
-                                        Eliminar
-                                    </button>
+
+<td class="rounded-r-3xl px-4 py-4 text-center overflow-visible">
+    <div class="flex justify-center gap-3 relative z-50">
+        {{-- Botón Editar --}}
+        <button
+            type="button"
+            wire:click="edit({{ $product->id }})"
+            class="inline-flex items-center gap-2 rounded-2xl bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-200"
+        >
+            <i data-lucide="edit-3" class="h-4 w-4"></i>
+            Editar
+        </button>
+
+        {{-- Botón Eliminar --}}
+
+<button
+    type="button"
+    wire:click="delete({{ $product->id }})"
+    class="inline-flex items-center gap-2 rounded-2xl !bg-red-600 px-4 py-2 text-xs font-semibold !text-white shadow-sm transition hover:!bg-red-700 relative z-50"
+>
+    <i data-lucide="trash-2" class="h-4 w-4"></i>
+    Eliminar
+</button>
+
+
                                 </div>
                             </td>
                         </tr>

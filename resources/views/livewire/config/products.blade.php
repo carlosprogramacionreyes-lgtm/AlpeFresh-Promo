@@ -5,7 +5,7 @@
 
 <section class="space-y-6">
     <div class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div class="rounded-3xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+        <div id="product-creation-form" class="rounded-3xl border border-slate-200/70 bg-white/90 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-semibold text-slate-900 dark:text-white">
@@ -15,9 +15,23 @@
                         Centraliza nombre, categoría, presentación y galería de imágenes para mantener un catálogo confiable para evaluaciones y reportes.
                     </p>
                 </div>
-                <span class="inline-flex h-10 items-center rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-sky-500 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-400/40">
-                    {{ $editingId ? 'Modo edición' : 'Alta rápida' }}
-                </span>
+                <div class="flex items-center gap-3">
+                    @if ($editingId)
+
+<button
+    type="button"
+    wire:click="saveProduct"
+    class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
+>
+    <i data-lucide="check-circle" class="h-4 w-4"></i>
+    Crear producto nuevo
+</button>
+
+                    @endif
+                    <span class="inline-flex h-10 items-center rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-sky-500 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-400/40">
+                        {{ $editingId ? 'Modo edición' : 'Alta rápida' }}
+                    </span>
+                </div>
             </div>
 
             <form wire:submit.prevent="save" class="mt-6 space-y-6">
@@ -70,21 +84,6 @@
                         @enderror
                     </div>
 
-                    <div class="space-y-2 md:col-span-2">
-                        <label for="product-description" class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">
-                            Descripción breve
-                        </label>
-                        <textarea
-                            id="product-description"
-                            rows="3"
-                            placeholder="Notas breves para equipo comercial o de evaluación."
-                            wire:model.defer="form.short_description"
-                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-emerald-300"
-                        ></textarea>
-                        @error('form.short_description')
-                            <p class="text-xs font-medium text-rose-500">{{ $message }}</p>
-                        @enderror
-                    </div>
 
                     <div class="space-y-2">
                         <label for="product-status" class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">
@@ -210,16 +209,23 @@
                             Cancelar
                         </button>
                     @endif
-                    <button
-                        type="submit"
-                        wire:loading.attr="disabled"
-                        wire:target="save,uploads"
-                        class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/40 transition hover:from-emerald-500 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                    >
-                        <i data-lucide="{{ $editingId ? 'save' : 'sparkles' }}" class="h-4 w-4"></i>
-                        <span wire:loading.remove wire:target="save">{{ $editingId ? 'Actualizar producto' : 'Crear producto' }}</span>
-                        <span wire:loading wire:target="save">Guardando...</span>
-                    </button>
+
+
+<button
+    type="submit"
+    wire:click="saveProduct"
+    wire:loading.attr="disabled"
+    wire:target="save,uploads"
+    class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:from-emerald-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
+>
+    <i data-lucide="{{ $editingId ? 'save' : 'sparkles' }}" class="h-4 w-4"></i>
+    <span>
+        {{ $editingId ? 'Guardar producto' : 'Crear producto nuevo' }}
+    </span>
+    <span wire:loading wire:target="saveProduct">Guardando...</span>
+</button>
+
+
                 </div>
             </form>
         </div>
@@ -350,7 +356,7 @@
                             </td>
                             <td class="px-4 py-4 align-middle">
                                 <div class="font-semibold text-slate-900 dark:text-slate-100">{{ $product->name }}</div>
-                                @if ($product->short_description)
+                                @if ($product->$product->description)
                                     <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">
                                         {{ Str::limit($product->short_description, 70) }}
                                     </p>

@@ -85,13 +85,20 @@ class Products extends Component
     {
         $validated = $this->validate($this->rules(), $this->validationMessages());
 
-        $payload = [
-            'name' => trim($validated['form']['name']),
-            'category' => $this->nullableValue($validated['form']['category']),
-            'presentation' => $this->nullableValue($validated['form']['presentation']),
-            'short_description' => $this->nullableValue($validated['form']['short_description']),
-            'is_active' => (bool) $validated['form']['is_active'],
-        ];
+
+
+
+$payload = [
+    'name' => trim($validated['form']['name']),
+    'slug' => Str::slug($validated['form']['name']), // 🔹 genera el slug automáticamente
+    'category' => $this->nullableValue($validated['form']['category']),
+    'presentation' => $this->nullableValue($validated['form']['presentation']),
+    'description' => $this->nullableValue($validated['form']['description'] ?? null),
+    'is_active' => $validated['form']['is_active'] ? 1 : 0,
+];
+
+
+
 
         if ($this->editingId) {
             $product = Product::with('images')->findOrFail($this->editingId);
@@ -109,6 +116,7 @@ class Products extends Component
         }
 
         $this->resetForm();
+        $this->resetPage(); // Reiniciar la paginación para asegurar el refresco de la tabla
     }
 
     public function edit(int $productId): void
@@ -120,7 +128,7 @@ class Products extends Component
             'name' => $product->name,
             'category' => $product->category,
             'presentation' => $product->presentation,
-            'short_description' => $product->short_description,
+            
             'is_active' => $product->is_active,
         ];
 

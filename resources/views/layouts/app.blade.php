@@ -20,7 +20,7 @@
         $menuItems = \App\Support\Navigation\MenuBuilder::forUser($currentUser);
     @endphp
     <body
-        x-data="appLayout()"
+        x-data="{ ...appLayout(), sidebarCollapsed: false, darkMode: false }"
         x-init="init(); return () => destroy()"
         x-bind:class="{'dark': darkMode}"
         class="min-h-full bg-slate-50 font-sans antialiased text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100"
